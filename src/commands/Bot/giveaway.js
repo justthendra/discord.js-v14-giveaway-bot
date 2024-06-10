@@ -71,7 +71,7 @@ module.exports = {
         };
 
         let giveaways = [];
-        const dataPath = './giveaways.json';
+        const dataPath = '../../giveaways.json';
 
    
         if (fs.existsSync(dataPath)) {
