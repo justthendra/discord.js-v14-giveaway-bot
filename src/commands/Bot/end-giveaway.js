@@ -17,7 +17,7 @@ module.exports = {
     const messageId = interaction.options.getString('mesaj_id');
     const winnersCount = interaction.options.getInteger('kazananlar');
     const channel = interaction.channel;
-    const dataPath = './giveaways.json';
+    const dataPath = '../../giveaways.json';
 
     try {
       
