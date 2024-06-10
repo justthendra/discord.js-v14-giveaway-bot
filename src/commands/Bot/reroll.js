@@ -22,10 +22,6 @@ module.exports = {
         
 
       const giveawayMessage = await channel.messages.fetch(messageId);
-
-      const regex = /\*\*Ödül:\*\*\s*(.*?)\n/;
-      const match = giveawayMessage.content.match(regex);
-      const prize = match ? match[1] : 'Bilinmeyen Ödül';
       const reactions = await giveawayMessage.reactions.cache.get('🎉').users.fetch();
       const participants = reactions.filter(user => !user.bot);
 
@@ -46,7 +42,7 @@ module.exports = {
       
       const embed = new EmbedBuilder()
         .setTitle('🎉 **ÇEKİLİŞ TEKRAR ÇEKİLDİ** 🎉')
-        .setDescription(`**Yeni kazananlar:** ${winnersText}\n**Ödül:** \`${prize}\``)
+        .setDescription(`**Yeni kazananlar:** ${winnersText}`)
         .setColor('Green')
         .setTimestamp();
 
