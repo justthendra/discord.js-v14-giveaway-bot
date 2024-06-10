@@ -17,14 +17,27 @@ module.exports = {
     const messageId = interaction.options.getString('mesaj_id');
     const winnersCount = interaction.options.getInteger('kazananlar');
     const channel = interaction.channel;
+    const dataPath = './giveaways.json';
 
     try {
       
         const giveawayMessage = await channel.messages.fetch(messageId);
+      
+        if (!fs.existsSync(dataPath)) {
+          return interaction.reply('Çekiliş bilgilerini içeren bir dosya bulunamadı.');
+        }
 
-        const regex = /\*\*Ödül:\*\*\s*(.*?)\n/;
-        const match = giveawayMessage.content.match(regex);
-        const prize = match ? match[1] : 'Bilinmeyen Ödül';
+        const rawData = fs.readFileSync(dataPath);
+        const giveaways = JSON.parse(rawData);
+
+     
+        const giveaway = giveaways.find(g => g.messageId === messageId);
+
+        if (!giveaway) {
+          return interaction.reply('Belirtilen mesaj ID\'si için bir çekiliş bulunamadı.');
+        }
+
+        const { prize, winnersCount } = giveaway;
         const reactions = await giveawayMessage.reactions.cache.get('🎉').users.fetch();
         const participants = reactions.filter(user => !user.bot);
 
@@ -35,11 +48,12 @@ module.exports = {
       
         const winners = [];
         for (let i = 0; i < winnersCount; i++) {
-            if (participants.size === 0) break;
-            const winner = participants.random();
-            winners.push(winner);
-            participants.delete(winner.id);
+          if (participants.size === 0) break; 
+          const winner = participants.random();
+          winners.push(winner);
+          participants.delete(winner.id);
         }
+
 
         const winnersText = winners.map(w => `<@${w.id}>`).join(', ');
 
@@ -49,6 +63,9 @@ module.exports = {
         .setColor('#FF0000')
         .setTimestamp();
         await interaction.reply({ embeds: [embed] });
+
+        const updatedGiveaways = giveaways.filter(g => g.messageId !== messageId);
+        fs.writeFileSync(dataPath, JSON.stringify(updatedGiveaways, null, 2), 'utf-8');
     } catch (error) {
       console.error(error);
       return interaction.reply('Belirtilen mesaj ID\'sine sahip bir çekiliş mesajı bulunamadı.');
