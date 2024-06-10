@@ -64,6 +64,27 @@ module.exports = {
 
         await giveawayMessage.react('🎉');
 
+        const giveawayData = {
+            messageId: giveawayMessage.id,
+            prize: prize,
+            winnersCount: winnersCount
+        };
+
+        let giveaways = [];
+        const dataPath = './giveaways.json';
+
+   
+        if (fs.existsSync(dataPath)) {
+              const rawData = fs.readFileSync(dataPath);
+              giveaways = JSON.parse(rawData);
+        }
+
+   
+        giveaways.push(giveawayData);
+
+    
+        fs.writeFileSync(dataPath, JSON.stringify(giveaways, null, 2), 'utf-8');
+
         setTimeout(async () => {
             const reactions = await giveawayMessage.reactions.cache.get('🎉').users.fetch();
             const participants = reactions.filter(user => !user.bot);
